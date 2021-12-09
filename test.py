@@ -1,3 +1,6 @@
+import numpy
+import numpy as np
+
 import weibull
 # import csv
 import pandas
@@ -6,7 +9,12 @@ import pandas
 # with open('data1.csv', newline='') as f:
 #    g = csv.reader(f)
 #    fail_times = next(g)
-data = pandas.read_csv("data3_noeditedit.csv", )
+data = pandas.read_csv("data3_noeditedit.csv")
+data = data.T
+numpy.concatenate(data)
+data = pandas.DataFrame([data])
+#data = data.T
+#print(data)
 # data = pandas.DataFrame(index=[10])
 # print(data)
 # data2 = (data)
