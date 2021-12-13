@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Welcome to weibull’s documentation! &#8212; weibull 0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-weibull-s-documentation">
+<h1>Welcome to weibull’s documentation!<a class="headerlink" href="#welcome-to-weibull-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#using-pip">Using <code class="docutils literal notranslate"><span class="pre">pip</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#using-setup-py">Using <code class="docutils literal notranslate"><span class="pre">setup.py</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#using-conda">Using <code class="docutils literal notranslate"><span class="pre">conda</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#fitting">Fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html#class-documentation">Class Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="design.html#class-documentation">Class Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weibayes.html">Weibayes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weibayes.html#class-documentation">Class Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#determining-beta-and-eta-values">Determining <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#life-calculations">Life Calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#basic-life-statistics">Basic Life Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#test-design">Test Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#weibayes-analysis">Weibayes Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gallery.html">Gallery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gallery.html#example-1-multiple-censored-data">Example 1: Multiple-Censored Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="briefintro.html">Brief Introduction to Reliability Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="briefintro.html#weibull-distribution">Weibull Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="briefintro.html#censoring-data">Censoring Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="briefintro.html#determining-beta-and-eta">Determining <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="briefintro.html#b-life">B-Life</a></li>
+<li class="toctree-l2"><a class="reference internal" href="briefintro.html#confidence-levels">Confidence Levels</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">weibull</span></code> package is a package designed for easy reliability analysis using the weibull distribution.  This documentation will not make a high effort to explain Weibull analysis but will, instead, focus on the use of the package.  Despite this, there are still some obligatory convention to establish in order to make the documentation and packaging readable.  Conventions are established in <a class="reference internal" href="briefintro.html#introduction-to-reliability-analysis"><span class="std std-ref">Introduction to Reliability Analysis</span></a>.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To install weibull into a Python 3 environment, simply <code class="docutils literal notranslate"><span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">weibull</span></code>.  This package does <em>not</em> support Python 2.</p>
+<section id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">weibull</span></code> package is built on <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, and <code class="docutils literal notranslate"><span class="pre">scipy</span></code> libraries.  If you are having trouble installing these libraries, particularly within windows, then you may wish to use the Anaconda distribution of Python.</p>
+</section>
+</section>
+<section id="test-coverage">
+<h2>Test Coverage<a class="headerlink" href="#test-coverage" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">weibull</span></code> package contains testing for the algorithmic elements of the analysis, but no testing for graphic generation.</p>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<p>There are three primary classes available in <code class="docutils literal notranslate"><span class="pre">weibull</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Analysis</span></code> - Used for analysis, you are probably wanting this</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Design</span></code> - Used for reliability test design</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Weibayes</span></code> - Used for analysis and design using some assumptions</p></li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
+  </ul></li>
+</ul>
+</div>
+<h3><a href="#">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weibayes.html">Weibayes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery.html">Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="briefintro.html">Brief Introduction to Reliability Analysis</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jason R. Jones.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Analysis &#8212; weibull 0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Design" href="design.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="analysis">
+<h1>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h1>
+<p>The Analysis class is the primary class which will provide methods for analyzing your life data. This class is designed to take your data and calculate <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> values along with generating any appropriate plots for display of your data.</p>
+<p>A typical use case of the <code class="docutils literal notranslate"><span class="pre">Analysis</span></code> case is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">weibull</span>
+
+<span class="c1"># fail times include no censored data</span>
+<span class="n">fail_times</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mf">9402.7</span><span class="p">,</span>
+    <span class="mf">6082.4</span><span class="p">,</span>
+    <span class="mf">13367.2</span><span class="p">,</span>
+    <span class="mf">10644.6</span><span class="p">,</span>
+    <span class="mf">8632.0</span><span class="p">,</span>
+    <span class="mf">3043.4</span><span class="p">,</span>
+    <span class="mf">12860.2</span><span class="p">,</span>
+    <span class="mf">1034.5</span><span class="p">,</span>
+    <span class="mf">2550.9</span><span class="p">,</span>
+    <span class="mf">3637.1</span>
+<span class="p">]</span>
+
+<span class="c1"># this is where the actual analysis and curve fitting occur</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">weibull</span><span class="o">.</span><span class="n">Analysis</span><span class="p">(</span><span class="n">fail_times</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;hour&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="fitting">
+<h2>Fitting<a class="headerlink" href="#fitting" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method is used to calculate appropriate <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> values, which are then stored into the class instance.  When <code class="docutils literal notranslate"><span class="pre">fit()</span></code> is called with no parameters, then the linear regression method of calculation is assumed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An alternative method is to use the Maximum Likelihood Estimation (MLE) method of fitting <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> to the data.  This may be done by specifying that the <code class="docutils literal notranslate"><span class="pre">method='mle'</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;mle&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In many cases, the <code class="docutils literal notranslate"><span class="pre">mle</span></code> and <code class="docutils literal notranslate"><span class="pre">lr</span></code> methods will yield very similar values for <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span>, but there are some cases in which one is preferred over the other.  It turns out that linear regression tends to work best for very low sample sizes, usually less than 15 while the maximum likelihood estimator works best for high sample sizes.  In both cases, the <code class="docutils literal notranslate"><span class="pre">probplot()</span></code> method should be used to verify that the data is a good fit.</p>
+<p>To retrieve the <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> values, simply use the instance variables <code class="docutils literal notranslate"><span class="pre">beta</span></code> and <code class="docutils literal notranslate"><span class="pre">eta</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;beta: </span><span class="si">{</span><span class="n">analysis</span><span class="o">.</span><span class="n">beta</span><span class="si">:</span><span class="s1"> .02f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;eta: </span><span class="si">{</span><span class="n">analysis</span><span class="o">.</span><span class="n">eta</span><span class="si">:</span><span class="s1"> .02f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When using the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method, it is also possible to set the confidence levels</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">stats()</span></code> method to get a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> containing most internal estimates:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$&gt; analysis.stats
+fit method          maximum likelihood estimation
+confidence                                    0.6
+beta lower limit                          2.42828
+beta nominal                              2.97444
+beta upper limit                          3.64344
+eta lower limit                           186.483
+eta nominal                               203.295
+eta upper limit                           221.622
+mean life                                  181.47
+median life                               179.727
+b10 life                                   95.401
+dtype: object
+</pre></div>
+</div>
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<p>One of the most often requested features of such a package is plotting the data, particularly in Jupyter Notebooks.  The <code class="docutils literal notranslate"><span class="pre">weibull</span></code> package comes with built-in methods to easily display and save standard plots with one-line methods.</p>
+<p>Building on the <code class="docutils literal notranslate"><span class="pre">analysis</span></code> instance above, we will examine the probability plot:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">probplot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/weibull-fit-10pt.png" src="_images/weibull-fit-10pt.png" />
+<p>There are some settings for the Weibull probability plots that will allow the user to add more information to the plot itself that are useful when the plot will be included in reports, on web pages, or other situations where the supporting information may not always accompany the plot.  These include being able to specify the Analyst’s name and/or the Company or Organization name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">analyst</span> <span class="o">=</span> <span class="s1">&#39;John Q. Smith&#39;</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">company</span> <span class="o">=</span> <span class="s1">&#39;Smith &amp; Smith Engineering&#39;</span>
+</pre></div>
+</div>
+<p>It should be noted that if either the Analyst or Company name is especially long, the annotation box (where they are displayed) will expand to fit the text which could obscure some portions of the Weibull plot.  To address this, you can place a line feed <code class="docutils literal notranslate"><span class="pre">'\n'</span></code> within either name which will force the text to wrap to a shorter length.  These must be defined before calling the <code class="docutils literal notranslate"><span class="pre">probplot</span></code> function.</p>
+<p>Also, the user can now provide their own more descriptive title for the plot, use the default title, or suppress the title altogether, as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">plot_title</span> <span class="o">=</span> <span class="s1">&#39;Weibull Analysis of Golden Widget Failures&#39;</span>
+</pre></div>
+</div>
+<p>Setting the title to a zero-length string (or not defining one at all) will cause the default title of ‘Weibull Probability Plot’ to be used.  Setting the title to <code class="docutils literal notranslate"><span class="pre">None</span></code> will suppress the title line altogether.  Any other value set for <code class="docutils literal notranslate"><span class="pre">analysis.plot_title</span></code> will be displayed on the Weibull plot.  This too must be defined before calling the <code class="docutils literal notranslate"><span class="pre">probplot</span></code> function.</p>
+<p>By default, the probability plot will now be 12 inch x 8 inch (1200 x 800 pixels) to better display enhancements made to the plot format, but it is also possible to change the size of the plot to a different size or aspect ratio by specifying the <code class="docutils literal notranslate"><span class="pre">figsize</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">probplot</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>where the values of 8 and 6 are in inches (at 100px/inch).  Be aware that generating plots smaller than the default size may result in the Y-Axis labels overlapping one another (especially when analyzing very large data sets), or the annotation box might covering some portion of the Weibull plot or the Characteristic Life line.  You may have to experiment with the size values to get a satisfactory result, and you may also need to use the image resizing features when inserting the image into a document or presentation.</p>
+<p>We can also examine a number of other common function plots (only the hazard plot is shown, but the others are along the same line):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">pdf</span><span class="p">()</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">sf</span><span class="p">()</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">hazard</span><span class="p">()</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">cdf</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/weibull-hazard-10pt.png" src="_images/weibull-hazard-10pt.png" />
+<p>Each of these functions will generate a plot that is suitable for publication or insertion into a Jupyter Notebook.  Again, note that some of these methods - such as <code class="docutils literal notranslate"><span class="pre">hazard()</span></code> and <code class="docutils literal notranslate"><span class="pre">cdf()</span></code> will produce the same plot with slightly different labeling.</p>
+<section id="confidence-levels">
+<h3>Confidence Levels<a class="headerlink" href="#confidence-levels" title="Permalink to this headline">¶</a></h3>
+<p>Some plots will contain a shaded region which reflects the <span class="xref std std-ref">confidence_levels</span>.  The confidence levels are calculate for <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> and the min/max values for <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> are explored rather than all possible values.  As a result, the visualizations shown are an approximation of the confidence limits.</p>
+</section>
+</section>
+<section id="class-documentation">
+<h2>Class Documentation<a class="headerlink" href="#class-documentation" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="weibull.Analysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weibull.</span></span><span class="sig-name descname"><span class="pre">Analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suspended</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cycle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and plots data points and curves for a standard 2-parameter Weibull for analyzing life data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – A list or numpy array of life data, i.e. <code class="docutils literal notranslate"><span class="pre">[127,</span> <span class="pre">234,</span> <span class="pre">329,</span> <span class="pre">444]</span></code></p></li>
+<li><p><strong>suspended</strong> – A list or numpy array of suspensions as boolean values, i.e. <code class="docutils literal notranslate"><span class="pre">[False,</span> <span class="pre">False,</span> <span class="pre">True,</span> <span class="pre">True]</span></code>. At any point which indicates <code class="docutils literal notranslate"><span class="pre">True</span></code> means that the test was stopped - or that the item was removed from the test - before the item failed.</p></li>
+<li><p><strong>unit</strong> – The unit (‘hour’, ‘minute’, ‘cycle’, etc.).  This is used to add some useful information to the visualizations.  For instance, if the unit is <code class="docutils literal notranslate"><span class="pre">hour</span></code>, then the x-axis will be labed in hours.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>beta</strong> – The current value of the shape parameter, <span class="math notranslate nohighlight">\(\beta\)</span>.  This value is initially set to <code class="docutils literal notranslate"><span class="pre">None</span></code>.  The proper value for <code class="docutils literal notranslate"><span class="pre">beta</span></code> will be calculated on call to the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.  The user may also set this value directly.</p></li>
+<li><p><strong>eta</strong> – The current value of the scale parameter, <span class="math notranslate nohighlight">\(\eta\)</span>. This value is initially set to <code class="docutils literal notranslate"><span class="pre">None</span></code>.  The proper value for <code class="docutils literal notranslate"><span class="pre">beta</span></code> will be calculated on call to the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.  The user may also set this value directly.</p></li>
+<li><p><strong>_fit_test</strong> – Basic statistics regarding the results of <code class="docutils literal notranslate"><span class="pre">fit()</span></code>, such as <span class="math notranslate nohighlight">\(R^2\)</span> and P-value.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.b">
+<span class="sig-name descname"><span class="pre">b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percent_failed:</span> <span class="pre">(&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'str'&gt;)</span> <span class="pre">=</span> <span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the B-life value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>percent_failed</strong> – the number of elements that have failed as a percent (i.e. 10)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the life in cycles/hours/etc.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.cdf">
+<span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.cdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the cumulative distribution function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> – True if the plot is to be shown, false if otherwise</p></li>
+<li><p><strong>file_name</strong> – the file name to be passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig</span></code></p></li>
+<li><p><strong>watermark_text</strong> – the text to include as a watermark</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.characteristic_life">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">characteristic_life</span></span><a class="headerlink" href="#weibull.Analysis.characteristic_life" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current characteristic life of the product, aka <span class="math notranslate nohighlight">\(\eta\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the characteristic life of the product</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.failures">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">failures</span></span><a class="headerlink" href="#weibull.Analysis.failures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of failures in the data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of failures in the data set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> using a linear regression
+or using the maximum likelihood method, depending on the ‘method’ value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – ‘lr’ for linear estimation or ‘mle’ for maximum likelihood estimation</p></li>
+<li><p><strong>confidence_level</strong> – A number between 0.001 and 0.999 which expresses the confidence levels desired.  This confidence level is reflected in all subsequent actions, especially in plots, and can also affect several internal variables which are shown in <code class="docutils literal notranslate"><span class="pre">stats</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.fr">
+<span class="sig-name descname"><span class="pre">fr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.fr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot failure rate as a function of cycles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> – True if the item is to be shown now, False if other elements to be added later</p></li>
+<li><p><strong>file_name</strong> – if file_name is stated, then the probplot will be saved as a PNG</p></li>
+<li><p><strong>watermark_text</strong> – the text to include as a watermark</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.hazard">
+<span class="sig-name descname"><span class="pre">hazard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.hazard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the hazard (CDF) function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> – True if the plot is to be shown, false if otherwise</p></li>
+<li><p><strong>file_name</strong> – the file name to be passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig</span></code></p></li>
+<li><p><strong>watermark_text</strong> – the text to include as a watermark</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.mean">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mean</span></span><a class="headerlink" href="#weibull.Analysis.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and returns mean life (aka, the MTTF) is the integral of the reliability function between 0 and inf,</p>
+<div class="math notranslate nohighlight">
+\[MTTF = \eta \Gamma(\frac{1}{\beta} + 1)\]</div>
+<p>where gamma function, <span class="math notranslate nohighlight">\(\Gamma\)</span>, is evaluated at <span class="math notranslate nohighlight">\(\frac{1}{\beta+1}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the mean life of the product</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.median">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">median</span></span><a class="headerlink" href="#weibull.Analysis.median" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and returns median life of the product</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The median life</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.mttf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mttf</span></span><a class="headerlink" href="#weibull.Analysis.mttf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and returns mean time between failures (MTTF)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the mean time to failure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.pdf">
+<span class="sig-name descname"><span class="pre">pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> – True if the plot is to be shown, false if otherwise</p></li>
+<li><p><strong>file_name</strong> – the file name to be passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig</span></code></p></li>
+<li><p><strong>watermark_text</strong> – the text to include as a watermark</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.probplot">
+<span class="sig-name descname"><span class="pre">probplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.probplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a probability plot.  Use this to show the data points plotted with
+the beta and eta values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> – True if the plot is to be shown, false if otherwise</p></li>
+<li><p><strong>file_name</strong> – the file name to be passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig</span></code></p></li>
+<li><p><strong>watermark_text</strong> – the text to include on the plot as a watermark</p></li>
+<li><p><strong>kwargs</strong> – valid matplotlib options</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.r_squared">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">r_squared</span></span><a class="headerlink" href="#weibull.Analysis.r_squared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the r squared value of the fit test</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the r squared value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="weibull.Analysis.sf">
+<span class="sig-name descname"><span class="pre">sf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">watermark_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weibull.Analysis.sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the survival function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show</strong> – True if the plot is to be shown, false if otherwise</p></li>
+<li><p><strong>file_name</strong> – the file name to be passed to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.savefig</span></code></p></li>
+<li><p><strong>watermark_text</strong> – the text to include as a watermark</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.stats">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stats</span></span><a class="headerlink" href="#weibull.Analysis.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fit statistics, confidence limits, etc
+:return: a pandas series containing the fit statistics</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="weibull.Analysis.suspensions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">suspensions</span></span><a class="headerlink" href="#weibull.Analysis.suspensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of suspensions in the data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of suspensions in the data set</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="design.html" title="next chapter">Design</a></li>
+  </ul></li>
+</ul>
+</div>
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fitting">Fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#class-documentation">Class Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weibayes.html">Weibayes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery.html">Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="briefintro.html">Brief Introduction to Reliability Analysis</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jason R. Jones.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/analysis.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

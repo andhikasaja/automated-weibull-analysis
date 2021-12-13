@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Examples &#8212; weibull 0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Gallery" href="gallery.html" />
+    <link rel="prev" title="Weibayes" href="weibayes.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<section id="determining-beta-and-eta-values">
+<h2>Determining <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> Values<a class="headerlink" href="#determining-beta-and-eta-values" title="Permalink to this headline">¶</a></h2>
+<p>Before any suppositions may be gathered, it is appropriate to calculate <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> values.  Once we are satisfied that <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> match the raw data, we can move on to determining useful life characteristics for the product.</p>
+<section id="example-1-complete-test-data">
+<h3>Example 1: Complete Test Data<a class="headerlink" href="#example-1-complete-test-data" title="Permalink to this headline">¶</a></h3>
+<p>In this example, we will take a complete set of failure data that has no censorship and apply basic weibull analysis tool suite in order to achieve a simple, accurate, and useful analysis.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">weibull</span>
+
+<span class="c1"># fail times include no censored data</span>
+<span class="n">fail_times</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mf">9402.7</span><span class="p">,</span>
+    <span class="mf">6082.4</span><span class="p">,</span>
+    <span class="mf">13367.2</span><span class="p">,</span>
+    <span class="mf">10644.6</span><span class="p">,</span>
+    <span class="mf">8632.0</span><span class="p">,</span>
+    <span class="mf">3043.4</span><span class="p">,</span>
+    <span class="mf">12860.2</span><span class="p">,</span>
+    <span class="mf">1034.5</span><span class="p">,</span>
+    <span class="mf">2550.9</span><span class="p">,</span>
+    <span class="mf">3637.1</span>
+<span class="p">]</span>
+
+
+<span class="c1"># this is where the actual analysis and curve fitting occur</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">weibull</span><span class="o">.</span><span class="n">Analysis</span><span class="p">(</span><span class="n">fail_times</span><span class="p">,</span>
+                            <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;hour&#39;</span><span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;mle&#39;</span><span class="p">)</span>
+
+<span class="n">analysis</span><span class="o">.</span><span class="n">probplot</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In this example, we chose to use the Maximum Likelihood Estimation method of estimating <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span>, which is shown in the <code class="docutils literal notranslate"><span class="pre">analysis.fit(method='mle)</span></code> line.  If the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method were called with no parameters, it would - by default - have used linear regression.</p>
+<p>By examining the probability plot, we can visually determine if the <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> are appropriately calculated.</p>
+<p>By specifying a file name, the probability plot can be saved to a file <code class="docutils literal notranslate"><span class="pre">analysis.probplot(file_name='prob.png')</span></code>.  This is optional, of course, and not required.</p>
+</section>
+<section id="example-2-right-censored-data">
+<h3>Example 2: Right-Censored Data<a class="headerlink" href="#example-2-right-censored-data" title="Permalink to this headline">¶</a></h3>
+<p>Often, it is necessary to use only the smallest amount of data in order to calculate the values for <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span>.  For instance, a long-running test might have 10 units on the test bench, but only 3 of them have failed.  When the data is so small, the default linear regression fit method is probably going to yield better results than the maximum-likelihood estimation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">current_run_time</span> <span class="o">=</span> <span class="mf">4200.0</span>
+
+<span class="n">fail_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_run_time</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span>
+<span class="n">fail_times</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1034.5</span>
+<span class="n">fail_times</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2550.9</span>
+<span class="n">fail_times</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3043.4</span>
+
+<span class="n">suspended</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+             <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">weibull</span><span class="o">.</span><span class="n">Analysis</span><span class="p">(</span><span class="n">fail_times</span><span class="p">,</span>
+                            <span class="n">suspended</span><span class="o">=</span><span class="n">suspended</span><span class="p">,</span>
+                            <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;hour&#39;</span><span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="n">analysis</span><span class="o">.</span><span class="n">probplot</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Again, we plot the raw data points against the calculated <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> in order to ensure that the linear regression is an appropriate fit for the data.  As more failures occur, more accurate curve fits may be run.</p>
+</section>
+</section>
+<section id="life-calculations">
+<h2>Life Calculations<a class="headerlink" href="#life-calculations" title="Permalink to this headline">¶</a></h2>
+<p>Once <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> are determined, then they may be utilized to obtain the basic lifetime data that may be utilized for planning.  One common reliability metric is the <a class="reference internal" href="briefintro.html#b-life"><span class="std std-ref">B-Life</span></a>.  Obtaining a B10 life using the <code class="docutils literal notranslate"><span class="pre">analysis</span></code> object is trivial:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;B10 life: </span><span class="si">{</span><span class="n">analysis</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As you can see, simply calling the <code class="docutils literal notranslate"><span class="pre">b()</span></code> function with the appropriate number as the parameter will return the B-life based on <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span>.</p>
+</section>
+<section id="basic-life-statistics">
+<h2>Basic Life Statistics<a class="headerlink" href="#basic-life-statistics" title="Permalink to this headline">¶</a></h2>
+<p>For user convenience, the <code class="docutils literal notranslate"><span class="pre">mean</span></code>, <code class="docutils literal notranslate"><span class="pre">median</span></code>, <code class="docutils literal notranslate"><span class="pre">characteristic_life</span></code>, and <code class="docutils literal notranslate"><span class="pre">mttf</span></code> are defined as attributes of the class and may be called at any time after an initial curve fit.  Note that there is some overlap with other class variables.  For instance, the <code class="docutils literal notranslate"><span class="pre">characteristic_life</span></code> happens to be the same thing as <code class="docutils literal notranslate"><span class="pre">eta</span></code>, but if a customer asks for the characteristic life, then having this available makes the code more readable and correspond more closely to the specification.</p>
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<p>We can also plot various functions of interest, such as the survival function and hazard functions, amongst others.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">pdf</span><span class="p">()</span>      <span class="c1"># probability density function</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">sf</span><span class="p">()</span>       <span class="c1"># survival function</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">hazard</span><span class="p">()</span>   <span class="c1"># hazard function</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">cdf</span><span class="p">()</span>      <span class="c1"># cumulative distribution function</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">fr</span><span class="p">()</span>       <span class="c1"># failure rate</span>
+</pre></div>
+</div>
+<p>Each of these will generate a plot of the function.  For all plotting methods, if <code class="docutils literal notranslate"><span class="pre">file_name</span></code> is specified as a parameter, then the method will save to a file rather than display.  For instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;survival_function.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="test-design">
+<h2>Test Design<a class="headerlink" href="#test-design" title="Permalink to this headline">¶</a></h2>
+<p>The Design class is to be utilized for two scenarios:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>determine the required number of units to prove the target reliability given a test cycles/duration</p></li>
+<li><p>determine the required number of cycles/duration to prove the target reliability given a number of units</p></li>
+</ul>
+</div></blockquote>
+<p>To begin, first import and instantiate the Designer, which is the utility for the test designer. There are several parameters to consider and all of them are requirements or assumptions that must be entered as parameters for the Designer class:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>target_cycles - the target to be proven in hours/days/weeks/cycles</p></li>
+<li><p>reliability - defaults to 0.9</p></li>
+<li><p>confidence_level - defaults to 0.95</p></li>
+<li><p>expected_beta - an initial assumption for beta (defaults to 2)</p></li>
+</ul>
+</div></blockquote>
+<p>Shown are two example calculations for a target lifetime of 10000 hours with a reliability of 0.9 at a confidence level of 0.5 and beta assumption of 1.5:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">weibull</span>
+
+<span class="n">designer</span> <span class="o">=</span> <span class="n">weibull</span><span class="o">.</span><span class="n">Design</span><span class="p">(</span>
+    <span class="n">target_cycles</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+    <span class="n">reliability</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">confidence_level</span><span class="o">=</span><span class="mf">0.90</span><span class="p">,</span>
+    <span class="n">expected_beta</span><span class="o">=</span><span class="mf">1.5</span>
+<span class="p">)</span>
+
+<span class="c1"># The &#39;test_cycles&#39; parameter can be in any units.</span>
+<span class="c1"># Days, weeks, hours, cycles, etc., so long</span>
+<span class="c1">#   as the target unit is consistent</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Minimum number of units for 10000 hour run:</span><span class="si">{</span><span class="n">designer</span><span class="o">.</span><span class="n">num_of_units</span><span class="p">(</span><span class="n">test_cycles</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Minimum hours for 20 units: </span><span class="si">{</span><span class="n">designer</span><span class="o">.</span><span class="n">num_of_cycles</span><span class="p">(</span><span class="n">num_of_units</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="weibayes-analysis">
+<h2>Weibayes Analysis<a class="headerlink" href="#weibayes-analysis" title="Permalink to this headline">¶</a></h2>
+<p>Use Weibayes analysis to assist with designing your test or evaluating reliability within a certain confidence interval based on historical data.</p>
+<p>You have a product that needs to be tested to B2 life of 40 million time units with a confidence limit of 95%.  The product had an expected beta of 2 (lots of historical data there).  B2 life is the same as 98% survival.</p>
+<p>Using the weibull test <cite>Design</cite> class, we need to run 62 units (the limit of our test rig) for 62 million time units with no failures:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">weibull</span>
+
+<span class="n">designer</span> <span class="o">=</span> <span class="n">weibull</span><span class="o">.</span><span class="n">Design</span><span class="p">(</span>
+    <span class="n">target_cycles</span><span class="o">=</span><span class="mf">40e6</span><span class="p">,</span>
+    <span class="n">reliability</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
+    <span class="n">confidence_level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+    <span class="n">expected_beta</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Minimum hours for 62 units: </span><span class="si">{</span><span class="n">designer</span><span class="o">.</span><span class="n">num_of_cycles</span><span class="p">(</span><span class="n">num_of_units</span><span class="o">=</span><span class="mi">62</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">61860134.45191945</span>
+</pre></div>
+</div>
+<p>Weibayes analysis on the data would arrive at the same result.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">weibull</span>
+
+<span class="c1"># we want N units to run for H hours each</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">62</span>
+<span class="n">H</span> <span class="o">=</span> <span class="mf">62.0e6</span>
+
+<span class="n">run_times_desired</span> <span class="o">=</span> <span class="p">[</span><span class="n">H</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>
+<span class="n">weibayes</span> <span class="o">=</span> <span class="n">weibull</span><span class="o">.</span><span class="n">Weibayes</span><span class="p">(</span><span class="n">run_times_desired</span><span class="p">,</span> <span class="n">confidence_level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;B2 life: </span><span class="si">{</span><span class="n">weibayes</span><span class="o">.</span><span class="n">b</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">B2</span> <span class="n">life</span><span class="p">:</span> <span class="mf">40090439.86038491</span>
+</pre></div>
+</div>
+<p>Note that this <cite>B2</cite> matches very closely with <cite>target_cycles</cite> value found in the above iteration of the <cite>Design</cite> class.</p>
+<p>We can further plot the data using <cite>weibayes.plot()</cite> resulting in:</p>
+<img alt="_images/weibayes.png" src="_images/weibayes.png" />
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="weibayes.html" title="previous chapter">Weibayes</a></li>
+      <li>Next: <a href="gallery.html" title="next chapter">Gallery</a></li>
+  </ul></li>
+</ul>
+</div>
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weibayes.html">Weibayes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#determining-beta-and-eta-values">Determining <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#life-calculations">Life Calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-life-statistics">Basic Life Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-design">Test Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#weibayes-analysis">Weibayes Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gallery.html">Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="briefintro.html">Brief Introduction to Reliability Analysis</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jason R. Jones.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/examples.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
