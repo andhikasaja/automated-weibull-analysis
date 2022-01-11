@@ -97,6 +97,7 @@ We can also examine a number of other common function plots (only the hazard plo
     analysis.sf()
     analysis.hazard()
     analysis.cdf()
+    
 
 .. image:: images/weibull-hazard-10pt.png
 

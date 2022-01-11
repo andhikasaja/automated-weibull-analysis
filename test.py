@@ -9,4 +9,6 @@ data = data.values.tolist()
 
 analysis = weibull.Analysis(data[0], unit='hour')
 analysis.fit(method='mle')
+# analysis.mtbf()
+# analysis.rel()
 analysis.fr()

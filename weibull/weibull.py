@@ -1,5 +1,5 @@
 import logging
-
+import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +28,7 @@ class ParameterError(Exception):
 # convenience functions
 def _weibull_ticks(y, _):
     # Round to 6 decimal places to deal w/roundoff error from exp function
-    ycoord = round(100 * (1 - np.exp(-np.exp(y))),6)
+    ycoord = round(100 * (1 - np.exp(-np.exp(y))), 6)
 
     # Format to only as many digits past the decimal as needed
     for i in range(0, 6):
@@ -55,7 +55,7 @@ class Analysis:
     :ivar _fit_test: Basic statistics regarding the results of ``fit()``, such as :math:`R^2` and P-value.
     """
 
-    def __init__(self, data: list, suspended: list=None, unit: str='cycle'):
+    def __init__(self, data: list, suspended: list = None, unit: str = 'cycle'):
 
         self.x_unit = unit
         self._fit_test = None
@@ -123,7 +123,8 @@ class Analysis:
         x0 = np.log(self.data.dropna()['data'].values)
         y = _ftolnln(self.data.dropna()['adjm_rank'])
 
-        slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(y, x0)
+        slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(
+            y, x0)
 
         beta = 1.0/slope
         x_intercept = - intercept / beta
@@ -134,7 +135,8 @@ class Analysis:
 
         logger.debug('beta: {:.2f}, eta: {:.2f}'.format(self.beta, self.eta))
 
-        self._fit_test = pd.Series({'r_squared': r_value ** 2, 'p_value': p_value, 'fit method': 'linear regression'})
+        self._fit_test = pd.Series(
+            {'r_squared': r_value ** 2, 'p_value': p_value, 'fit method': 'linear regression'})
 
     def _maximum_likelihood_estimation(self):
         r"""
@@ -147,7 +149,8 @@ class Analysis:
 
         dtf_failed = df_failed["data"].values
 
-        df_failed["ln_x_div_r"] = df_failed.apply(lambda s: np.log(s['data'])/len(df_failed), axis=1)
+        df_failed["ln_x_div_r"] = df_failed.apply(
+            lambda s: np.log(s['data'])/len(df_failed), axis=1)
 
         dtf_all = self.data['data'].values
 
@@ -166,7 +169,8 @@ class Analysis:
             c = np.sum((dtf_all ** shape) * np.log(dtf_all))
             h = np.sum((dtf_all ** shape) * (np.log(dtf_all)) ** 2)
 
-            shape = shape + (a + (1.0 / shape) - (c / b)) / ((1.0 / shape ** 2) + ((b * h) - c ** 2) / b ** 2)
+            shape = shape + (a + (1.0 / shape) - (c / b)) / \
+                             ((1.0 / shape ** 2) + ((b * h) - c ** 2) / b ** 2)
 
         shape = max(shape, 0.005)
         scale = (np.sum((dtf_all ** shape) / len(df_failed))) ** (1 / shape)
@@ -174,7 +178,8 @@ class Analysis:
         self.beta = shape
         self.eta = scale
 
-        self._fit_test = pd.Series({'fit method': 'maximum likelihood estimation'})
+        self._fit_test = pd.Series(
+            {'fit method': 'maximum likelihood estimation'})
 
     def _confidence(self, confidence=0.95):
         r"""
@@ -190,7 +195,8 @@ class Analysis:
         # step 3
         def calc(t):
             first_term = self.beta / self.eta ** 2
-            second_term = ((t/self.eta) ** self.beta) * (self.beta / self.eta ** 2) * (self.beta + 1)
+            second_term = ((t/self.eta) ** self.beta) * \
+                           (self.beta / self.eta ** 2) * (self.beta + 1)
 
             return first_term - second_term
 
@@ -198,7 +204,8 @@ class Analysis:
 
         def calc(t):
             first_term = -1.0 / (self.beta ** 2)
-            second_term = ((t / self.eta) ** self.beta) * (np.log(t / self.eta) ** 2)
+            second_term = ((t / self.eta) ** self.beta) * \
+                           (np.log(t / self.eta) ** 2)
 
             return first_term - second_term
 
@@ -206,7 +213,8 @@ class Analysis:
 
         def calc(t):
             first_term = -1.0 / self.eta
-            second_term = ((t / self.eta) ** self.beta) * (1.0 / self.eta) * (self.beta * np.log(t / self.eta) + 1.0)
+            second_term = ((t / self.eta) ** self.beta) * (1.0 /
+                           self.eta) * (self.beta * np.log(t / self.eta) + 1.0)
 
             return first_term + second_term
 
@@ -238,8 +246,10 @@ class Analysis:
         k_index = (1.0 - confidence)/2 + confidence
         k = nd.ppf(k_index)
 
-        beta_lower = self.beta / (np.e ** (k * np.sqrt(fprime[1, 1]) / self.beta))
-        beta_upper = self.beta * np.e ** (k * np.sqrt(fprime[1, 1]) / self.beta)
+        beta_lower = self.beta / \
+            (np.e ** (k * np.sqrt(fprime[1, 1]) / self.beta))
+        beta_upper = self.beta * \
+            np.e ** (k * np.sqrt(fprime[1, 1]) / self.beta)
 
         eta_lower = self.eta / (np.e ** (k * np.sqrt(fprime[0, 0]) / self.eta))
         eta_upper = self.eta * np.e ** (k * np.sqrt(fprime[0, 0]) / self.eta)
@@ -252,7 +262,7 @@ class Analysis:
         self._fit_test['eta nominal'] = self.eta
         self._fit_test['eta upper limit'] = eta_upper
 
-    def fit(self, method: str='lr', confidence_level: float=0.9):
+    def fit(self, method: str = 'lr', confidence_level: float = 0.9):
         r"""
         Calculate :math:`\beta` and :math:`\eta` using a linear regression
         or using the maximum likelihood method, depending on the 'method' value.
@@ -281,7 +291,7 @@ class Analysis:
 
         self._confidence(confidence_level)
 
-    def probplot(self, show: bool=True, file_name: str=None,
+    def probplot(self, show: bool = True, file_name: str = None,
                  watermark_text=None, **kwargs):
         r"""
         Generate a probability plot.  Use this to show the data points plotted with
@@ -349,8 +359,8 @@ class Analysis:
                         linewidth=0.5)
 
         # Highlight the 'Characteristic Life' (Eta) line at 63.2%
-        plt.semilogx(ax.get_xlim(), [0,0], color='#FF3F3F', linestyle='dashed',
-                    label = u'Characteristic Life (\u03B7) @ 63.2%')
+        plt.semilogx(ax.get_xlim(), [0, 0], color='#FF3F3F', linestyle='dashed',
+                    label=u'Characteristic Life (\u03B7) @ 63.2%')
         plt.semilogx([self.eta, self.eta], [-15, 0], color='#FF3F3F',
                     linestyle='dashed')
 
@@ -403,7 +413,7 @@ class Analysis:
             plt.semilogx(self.data['data'],
                          _ftolnln(self.data['med_rank']), 'o')
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Need to account for 'scaled' 3-parameter Weibulls (when implemented)
         if tzero == 0:
             # Calculate the y value endpoints for the line fit
@@ -420,7 +430,7 @@ class Analysis:
         # Calculate the x values for the specified y values
         x_ideal = self.eta * (np.exp(y_ideal) ** (1/self.beta)) + tzero
 
-        #----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # Define other values to display in Legend
 
         rsquared = self.r_squared
@@ -465,7 +475,7 @@ class Analysis:
             weibull_type = '3-Parameter Weibull'
 
         weibull_type += ',\n' + self._fit_test['fit method'].title()
-        plt.semilogx(x_ideal, y_ideal, label = weibull_type)
+        plt.semilogx(x_ideal, y_ideal, label=weibull_type)
 
         # Create the legend & apply formatting
         leg = plt.legend(frameon=True, loc='upper left', framealpha=1.0)
@@ -506,7 +516,7 @@ class Analysis:
         if show:
             plt.show()
 
-    def pdf(self, show: bool=True, file_name: str=None,
+    def pdf(self, show: bool = True, file_name: str = None,
             watermark_text=None):
         r"""
         Plot the probability density function
@@ -528,7 +538,7 @@ class Analysis:
                         y_label='probability/{}'.format(self.x_unit),
                         watermark_text=watermark_text)
 
-    def sf(self, show: bool=True, file_name: str=None,
+    def sf(self, show: bool = True, file_name: str = None,
            watermark_text=None):
         r"""
         Plot the survival function
@@ -574,7 +584,7 @@ class Analysis:
                         y_label='probability of survival',
                         watermark_text=watermark_text)
 
-    def hazard(self, show: bool=True, file_name: str=None,
+    def hazard(self, show: bool = True, file_name: str = None,
                watermark_text=None):
         r"""
         Plot the hazard (CDF) function
@@ -587,7 +597,7 @@ class Analysis:
         self.cdf(show, file_name,
                  watermark_text=watermark_text)
 
-    def cdf(self, show: bool=True, file_name: str=None,
+    def cdf(self, show: bool = True, file_name: str = None,
             watermark_text=None):
         r"""
         Plot the cumulative distribution function
@@ -633,7 +643,7 @@ class Analysis:
                         y_label='probability of failure',
                         watermark_text=watermark_text)
 
-    def fr(self, show: bool=True, file_name: str=None,
+    def fr(self, show: bool = True, file_name: str = None,
            watermark_text=None):
         r"""
         Plot failure rate as a function of cycles
@@ -660,7 +670,8 @@ class Analysis:
             max_y = y
             for beta in betas:
                 for eta in etas:
-                    values = (beta / eta) * (x / eta) ** (beta - 1)
+                    values = ((beta * x ** (beta - 1)) / (eta ** beta))*np.exp(-(1/eta))
+                    #values = (beta / eta) * (x / eta) ** (beta - 1)
                     min_y = np.minimum(min_y, values)
                     max_y = np.maximum(max_y, values)
 
@@ -673,6 +684,101 @@ class Analysis:
                         title='Failure Rate',
                         y_label='failures/{}'.format(self.x_unit),
                         watermark_text=watermark_text)
+
+# ########################################################################################################################
+
+    def mtbf(self, show: bool=True, file_name: str=None,
+            watermark_text=None):
+            r"""
+            Plot MTBF as a function of cycles
+
+            :param show: True if the item is to be shown now, False if other elements to be added later
+            :param file_name: if file_name is stated, then the probplot will be saved as a PNG
+            :param watermark_text: the text to include as a watermark
+            :return: None
+            """
+            if not self.eta or not self.beta:
+                raise ParameterError
+
+            x = np.linspace(0.01, self.eta * 2, 1000)
+            y = (self.beta / self.eta) * (x / self.eta) ** (self.beta - 1)
+
+            if self._fit_test is not None:
+                betas = np.linspace(self._fit_test['beta lower limit'],
+                                    self._fit_test['beta upper limit'],
+                                    10)
+                etas = np.linspace(self._fit_test['eta lower limit'],
+                                self._fit_test['eta upper limit'],
+                                10)
+                min_y = y
+                max_y = y
+                for beta in betas:
+                    for eta in etas:
+                        values = eta*gamma((1/beta)+1)
+                        # values = np.exp(-((x-0)/eta)**beta)
+                        # values = (beta / eta) * (x / eta) ** (beta - 1)
+                        min_y = np.minimum(min_y, values)
+                        max_y = np.maximum(max_y, values)
+
+            else:
+                min_y = None
+                max_y = None
+            print(values)
+            # self._plot_prob(x, y, min_y, max_y,
+            #                 show=show, file_name=file_name,
+            #                 title='MTBF',
+            #                 y_label='mtbf/{}'.format(self.x_unit),
+            #                 watermark_text=watermark_text)
+
+# #######################################################################################################
+
+
+
+########################################################################################################################
+
+    def rel(self, show: bool=True, file_name: str=None,
+            watermark_text=None):
+            r"""
+            Plot Reliability as a function of cycles
+
+            :param show: True if the item is to be shown now, False if other elements to be added later
+            :param file_name: if file_name is stated, then the probplot will be saved as a PNG
+            :param watermark_text: the text to include as a watermark
+            :return: None
+            """
+            if not self.eta or not self.beta:
+                raise ParameterError
+
+            x = np.linspace(0.01, self.eta * 2, 1000)
+            y = (self.beta / self.eta) * (x / self.eta) ** (self.beta - 1)
+
+            if self._fit_test is not None:
+                betas = np.linspace(self._fit_test['beta lower limit'],
+                                    self._fit_test['beta upper limit'],
+                                    10)
+                etas = np.linspace(self._fit_test['eta lower limit'],
+                                self._fit_test['eta upper limit'],
+                                10)
+                min_y = y
+                max_y = y
+                for beta in betas:
+                    for eta in etas:
+                        values = np.exp(-((x-0)/eta)**beta)
+                        # values = (beta / eta) * (x / eta) ** (beta - 1)
+                        min_y = np.minimum(min_y, values)
+                        max_y = np.maximum(max_y, values)
+
+            else:
+                min_y = None
+                max_y = None
+            print(values)
+            self._plot_prob(x, y, min_y, max_y,
+                            show=show, file_name=file_name,
+                            title='Reliability',
+                            y_label='reliability/{}'.format(self.x_unit),
+                            watermark_text=watermark_text)
+
+#######################################################################################################
 
     def _plot_prob(self, x: list, y: list,
                    min_y: list=None, max_y: list=None,
@@ -700,8 +806,8 @@ class Analysis:
                                                                   self.eta))
 
         plt.legend()
-        plt.xlim(0)
-        plt.ylim(0)
+        plt.xlim(-2000)
+        plt.ylim(-0.01)
 
         plt.xlabel('{}s'.format(self.x_unit))
         plt.ylabel(y_label)
